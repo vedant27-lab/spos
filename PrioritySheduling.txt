@@ -1,0 +1,72 @@
+package Process_Sheduling;
+
+import java.util.*;
+
+class ProcessPriority{
+	int pid, arrivalTime, burstTime, priority;
+	int completionTime, turnaroundTime, waitingTime, remainingTime;
+}
+
+public class PriorityScheduling {
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		System.out.print("Enter the number Processes: ");
+		int n = sc.nextInt();
+		
+		ProcessPriority[] p = new ProcessPriority[n];
+		for(int i = 0; i<n; i++) {
+			p[i] = new ProcessPriority();
+			p[i].pid = i+1;
+			System.out.print("Enter the Arrival time, burst time and priority for the corresponding process: ");
+			p[i].arrivalTime = sc.nextInt();
+			p[i].burstTime = sc.nextInt();
+			p[i].priority = sc.nextInt();
+			
+			p[i].remainingTime = p[i].burstTime;
+		}
+		
+		int time = 0, completed = 0;
+		double totalTAT = 0, totalWT = 0;
+		
+		while(completed < n) {
+			ProcessPriority highest = null;
+			
+			for(ProcessPriority pr : p) {
+				if(pr.arrivalTime <= time && pr.remainingTime > 0) {
+					if(highest == null || pr.priority < highest.priority) {
+						highest = pr;
+					}
+				}
+				
+				if(highest == null) {
+					time++;
+					continue;
+				}
+				
+				time += highest.burstTime;
+				highest.completionTime = time;
+				highest.turnaroundTime = highest.completionTime - highest.arrivalTime;
+				highest.waitingTime = highest.turnaroundTime - highest.burstTime;
+				highest.remainingTime = 0;
+				
+				totalTAT += highest.turnaroundTime;
+				totalWT += highest.waitingTime;
+				completed++;
+			}
+		}
+		
+		System.out.println("\n----- Priority (Non-Preemptive) Scheduling -----");
+        System.out.println("PID\tAT\tBT\tPR\tCT\tTAT\tWT");
+
+        for (ProcessPriority pr : p) {
+            System.out.printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\n",
+                    pr.pid, pr.arrivalTime, pr.burstTime, pr.priority,
+                    pr.completionTime, pr.turnaroundTime, pr.waitingTime);
+        }
+
+        System.out.printf("\nAverage Turnaround Time: %.2f", totalTAT / n);
+        System.out.printf("\nAverage Waiting Time: %.2f\n", totalWT / n);
+	}
+}

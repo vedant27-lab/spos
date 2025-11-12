@@ -1,0 +1,111 @@
+package Process_Sheduling;
+
+import java.util.*;
+
+public class PageReplacement {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of pages: ");
+        int n = sc.nextInt();
+        int[] pages = new int[n];
+        System.out.println("Enter page reference string:");
+        for (int i = 0; i < n; i++)
+            pages[i] = sc.nextInt();
+
+        System.out.print("Enter number of frames: ");
+        int frames = sc.nextInt();
+
+        System.out.println("\n1. FIFO\n2. LRU\n3. Optimal");
+        System.out.print("Enter your choice: ");
+        int choice = sc.nextInt();
+
+        switch (choice) {
+            case 1 -> fifo(pages, frames);
+            case 2 -> lru(pages, frames);
+            case 3 -> optimal(pages, frames);
+            default -> System.out.println("Invalid choice!");
+        }
+    }
+
+    // ---------------- FIFO ----------------
+    static void fifo(int[] pages, int frames) {
+        Queue<Integer> memory = new LinkedList<>();
+        int pageFaults = 0;
+
+        System.out.println("\n--- FIFO Page Replacement ---");
+        for (int page : pages) {
+            if (!memory.contains(page)) {
+                if (memory.size() == frames)
+                    memory.poll(); // remove oldest
+                memory.add(page);
+                pageFaults++;
+            }
+            System.out.println("Page: " + page + " | Frames: " + memory + (memory.contains(page) ? "" : " *FAULT*"));
+        }
+
+        System.out.println("\nTotal Page Faults = " + pageFaults);
+    }
+
+    // ---------------- LRU ----------------
+    static void lru(int[] pages, int frames) {
+        ArrayList<Integer> memory = new ArrayList<>();
+        int pageFaults = 0;
+
+        System.out.println("\n--- LRU Page Replacement ---");
+        for (int page : pages) {
+            if (!memory.contains(page)) {
+                if (memory.size() == frames)
+                    memory.remove(0); // remove least recently used
+                memory.add(page);
+                pageFaults++;
+            } else {
+                // move page to most recent position
+                memory.remove((Integer) page);
+                memory.add(page);
+            }
+            System.out.println("Page: " + page + " | Frames: " + memory + (memory.contains(page) ? "" : " *FAULT*"));
+        }
+
+        System.out.println("\nTotal Page Faults = " + pageFaults);
+    }
+
+    // ---------------- OPTIMAL ----------------
+    static void optimal(int[] pages, int frames) {
+        ArrayList<Integer> memory = new ArrayList<>();
+        int pageFaults = 0;
+
+        System.out.println("\n--- Optimal Page Replacement ---");
+        for (int i = 0; i < pages.length; i++) {
+            int page = pages[i];
+
+            if (!memory.contains(page)) {
+                if (memory.size() == frames) {
+                    // find page to replace
+                    int farthest = -1, replaceIndex = -1;
+                    for (int j = 0; j < memory.size(); j++) {
+                        int current = memory.get(j);
+                        int nextUse = Integer.MAX_VALUE;
+                        for (int k = i + 1; k < pages.length; k++) {
+                            if (pages[k] == current) {
+                                nextUse = k;
+                                break;
+                            }
+                        }
+                        if (nextUse > farthest) {
+                            farthest = nextUse;
+                            replaceIndex = j;
+                        }
+                    }
+                    memory.set(replaceIndex, page);
+                } else {
+                    memory.add(page);
+                }
+                pageFaults++;
+            }
+            System.out.println("Page: " + page + " | Frames: " + memory + (memory.contains(page) ? "" : " *FAULT*"));
+        }
+
+        System.out.println("\nTotal Page Faults = " + pageFaults);
+    }
+}

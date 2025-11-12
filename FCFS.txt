@@ -1,0 +1,56 @@
+package Process_Sheduling;
+
+import java.util.*;
+
+class Process {
+	int pid, arrivalTime, burstTime;
+	int completionTime, turnaroundTime, waitingTime;
+}
+
+public class FCFS {
+	
+	public static void main(String[] arg) {
+		Scanner sc = new Scanner(System.in);
+		
+		System.out.println("Enter the number of processes: ");
+		int n = sc.nextInt();
+		
+		Process[] p = new Process[n];
+		
+		for (int i = 0; i<n; i++) {
+			p[i] = new Process();
+			
+			p[i].pid = i+1;
+			
+			System.out.println("Enter Arrival Timer and Burst Time for the process: ");
+			p[i].arrivalTime = sc.nextInt();
+			p[i].burstTime = sc.nextInt();
+		}
+		Arrays.sort(p, Comparator.comparingInt(a -> a.arrivalTime));
+		
+		int time = 0;
+		for(Process pr : p) {
+			time = Math.max(time, pr.arrivalTime);
+			pr.completionTime = time + pr.burstTime;
+			pr.turnaroundTime = pr.completionTime = pr.arrivalTime;
+			pr.waitingTime = pr.turnaroundTime = pr.burstTime;
+			time = pr.completionTime;
+		}
+		
+		System.out.println("\n-----FCFS Scheduling-----");
+		System.out.println("PID\tAT\tBT\tCT\tTAT\tWT");
+		double totalTAT = 0, totalWT = 0;
+		for(Process pr : p) {
+			System.out.printf("%d\t%d\t%d\t%d\t%d\t%d\n",
+					pr.pid, pr.arrivalTime, pr.burstTime, pr.completionTime, pr.turnaroundTime, pr.waitingTime);
+			totalTAT += pr.turnaroundTime;
+			totalWT += pr.waitingTime;
+		}
+		
+		System.out.println("The average turnaround time of the FCFS scheduling is: " + totalTAT/n);
+		System.out.println("The average waiting time of the FCFS scheduling is: " + totalWT/n);
+
+		
+	}
+	
+}

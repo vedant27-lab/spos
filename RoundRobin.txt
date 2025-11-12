@@ -1,0 +1,80 @@
+package Process_Sheduling;
+
+import java.util.*;
+
+class ProcessRR {
+    int pid, arrivalTime, burstTime;
+    int completionTime, turnaroundTime, waitingTime, remainingTime;
+}
+
+public class RoundRobin {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+
+        ProcessRR[] p = new ProcessRR[n];
+        for (int i = 0; i < n; i++) {
+            p[i] = new ProcessRR();
+            p[i].pid = i + 1;
+            System.out.print("Enter Arrival Time and Burst Time for Process " + p[i].pid + ": ");
+            p[i].arrivalTime = sc.nextInt();
+            p[i].burstTime = sc.nextInt();
+            p[i].remainingTime = p[i].burstTime;
+        }
+
+        System.out.print("Enter Time Quantum: ");
+        int tq = sc.nextInt();
+
+        Arrays.sort(p, Comparator.comparingInt(a -> a.arrivalTime));
+
+        Queue<ProcessRR> queue = new LinkedList<>();
+        int time = 0, completed = 0, i = 0;
+        double totalTAT = 0, totalWT = 0;
+        while (completed < n) {
+            while (i < n && p[i].arrivalTime <= time) {
+                queue.add(p[i]);
+                i++;
+            }
+
+            if (queue.isEmpty()) {
+                time++;
+                continue;
+            }
+
+            ProcessRR curr = queue.poll();
+
+            int execTime = Math.min(curr.remainingTime, tq);
+            curr.remainingTime -= execTime;
+            time += execTime;
+
+            while (i < n && p[i].arrivalTime <= time) {
+                queue.add(p[i]);
+                i++;
+            }
+
+            if (curr.remainingTime > 0) {
+                queue.add(curr);  
+            } else {
+                curr.completionTime = time;
+                curr.turnaroundTime = curr.completionTime - curr.arrivalTime;
+                curr.waitingTime = curr.turnaroundTime - curr.burstTime;
+                totalTAT += curr.turnaroundTime;
+                totalWT += curr.waitingTime;
+                completed++;
+            }
+        }
+
+        System.out.println("\n----- Round Robin Scheduling -----");
+        System.out.println("PID\tAT\tBT\tCT\tTAT\tWT");
+        for (ProcessRR pr : p) {
+            System.out.printf("%d\t%d\t%d\t%d\t%d\t%d\n",
+                    pr.pid, pr.arrivalTime, pr.burstTime,
+                    pr.completionTime, pr.turnaroundTime, pr.waitingTime);
+        }
+
+        System.out.printf("\nAverage Turnaround Time: %.2f", totalTAT / n);
+        System.out.printf("\nAverage Waiting Time: %.2f\n", totalWT / n);
+    }
+}

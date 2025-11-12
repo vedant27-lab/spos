@@ -1,0 +1,68 @@
+package Process_Sheduling;
+
+import java.util.*;
+
+class ProcessSJF {
+    int pid, arrivalTime, burstTime;
+    int completionTime, turnaroundTime, waitingTime, remainingTime;
+}
+
+public class ShortestJobFirst {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+
+        ProcessSJF[] p = new ProcessSJF[n];
+        for (int i = 0; i < n; i++) {
+            p[i] = new ProcessSJF();
+            p[i].pid = i + 1;
+            System.out.print("Enter Arrival Time and Burst Time for Process " + p[i].pid + ": ");
+            p[i].arrivalTime = sc.nextInt();
+            p[i].burstTime = sc.nextInt();
+            p[i].remainingTime = p[i].burstTime;
+        }
+
+        int completed = 0, time = 0;
+        double totalTAT = 0, totalWT = 0;
+
+        while (completed < n) {
+            ProcessSJF shortest = null;
+
+            for (ProcessSJF pr : p) {
+                if (pr.arrivalTime <= time && pr.remainingTime > 0) {
+                    if (shortest == null || pr.remainingTime < shortest.remainingTime)
+                        shortest = pr;
+                }
+            }
+
+            if (shortest == null) {
+                time++;
+                continue;
+            }
+
+            shortest.remainingTime--;
+            time++;
+            if (shortest.remainingTime == 0) {
+                shortest.completionTime = time;
+                shortest.turnaroundTime = shortest.completionTime - shortest.arrivalTime;
+                shortest.waitingTime = shortest.turnaroundTime - shortest.burstTime;
+                totalTAT += shortest.turnaroundTime;
+                totalWT += shortest.waitingTime;
+                completed++;
+            }
+        }
+
+        System.out.println("\n----- SJF (Preemptive) Scheduling -----");
+        System.out.println("PID\tAT\tBT\tCT\tTAT\tWT");
+        for (ProcessSJF pr : p) {
+            System.out.printf("%d\t%d\t%d\t%d\t%d\t%d\n",
+                    pr.pid, pr.arrivalTime, pr.burstTime,
+                    pr.completionTime, pr.turnaroundTime, pr.waitingTime);
+        }
+
+        System.out.printf("\nAverage Turnaround Time: %.2f", totalTAT / n);
+        System.out.printf("\nAverage Waiting Time: %.2f\n", totalWT / n);
+    }
+}

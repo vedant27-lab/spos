@@ -1,0 +1,127 @@
+import java.util.*;
+
+public class TwoPassAssemblr {
+
+    // Machine Opcode Table
+    static Map<String, String[]> MOT = new HashMap<>();
+
+    static {
+        MOT.put("STOP", new String[]{"IS", "00"});
+        MOT.put("ADD", new String[]{"IS", "01"});
+        MOT.put("SUB", new String[]{"IS", "02"});
+        MOT.put("MULT", new String[]{"IS", "03"});
+        MOT.put("MOVER", new String[]{"IS", "04"});
+        MOT.put("MOVEM", new String[]{"IS", "05"});
+        MOT.put("COMP", new String[]{"IS", "06"});
+        MOT.put("BC", new String[]{"IS", "07"});
+        MOT.put("DIV", new String[]{"IS", "08"});
+        MOT.put("READ", new String[]{"IS", "09"});
+        MOT.put("PRINT", new String[]{"IS", "10"});
+        MOT.put("START", new String[]{"AD", "01"});
+        MOT.put("END", new String[]{"AD", "02"});
+        MOT.put("ORIGIN", new String[]{"AD", "03"});
+        MOT.put("EQU", new String[]{"AD", "04"});
+        MOT.put("LTORG", new String[]{"AD", "05"});
+        MOT.put("DC", new String[]{"DL", "01"});
+        MOT.put("DS", new String[]{"DL", "02"});
+    }
+
+    public static void main(String[] args) {
+        // Assembly Program (input)
+        String[] code = {
+            "START 100",
+            "MOVER AREG, ='5'",
+            "ADD BREG, ONE",
+            "ONE DC 1",
+            "END"
+        };
+
+        // Tables
+        Map<String, Integer> symbolTable = new HashMap<>();
+        List<String> literalTable = new ArrayList<>();
+        List<Integer> literalAddress = new ArrayList<>();
+        List<String> intermediateCode = new ArrayList<>();
+
+        int LC = 0;
+
+        for (String line : code) {
+            String[] parts = line.trim().split("[ ,]+");
+            String opcode = parts[0].toUpperCase();
+
+            if (opcode.equals("START")) {
+                LC = Integer.parseInt(parts[1]);
+                intermediateCode.add("(AD,01) (C," + LC + ")");
+                continue;
+            }
+
+            if (opcode.equals("END")) {
+                int addr = LC;
+                for (int i = 0; i < literalAddress.size(); i++) {
+                    if (literalAddress.get(i) == -1) {
+                        literalAddress.set(i, addr++);
+                    }
+                }
+                intermediateCode.add("(AD,02)");
+                break;
+            }
+
+            if (MOT.containsKey(opcode)) {
+                String cls = MOT.get(opcode)[0];
+                String op = MOT.get(opcode)[1];
+
+                if (cls.equals("DL")) {
+                    symbolTable.put(parts[0], LC);
+                    intermediateCode.add("(DL," + op + ") (C," + parts[2] + ")");
+                    LC++;
+                } else if (cls.equals("IS")) {
+                    String reg = parts[1].equals("AREG") ? "1" :
+                                 parts[1].equals("BREG") ? "2" :
+                                 parts[1].equals("CREG") ? "3" : "0";
+                    String operand = parts[2];
+                    if (operand.startsWith("=")) {
+                        literalTable.add(operand);
+                        literalAddress.add(-1);
+                        intermediateCode.add("(IS," + op + ") (" + reg + ")(L," + literalTable.size() + ")");
+                    } else {
+                        symbolTable.putIfAbsent(operand, -1);
+                        intermediateCode.add("(IS," + op + ") (" + reg + ")(S," + operand + ")");
+                    }
+                    LC++;
+                }
+            }
+        }
+
+        System.out.println("\n--- INTERMEDIATE CODE ---");
+        for (String ic : intermediateCode) System.out.println(ic);
+
+        System.out.println("\n--- SYMBOL TABLE ---");
+        symbolTable.forEach((k, v) -> System.out.println(k + " -> " + v));
+
+        System.out.println("\n--- LITERAL TABLE ---");
+        for (int i = 0; i < literalTable.size(); i++)
+            System.out.println(literalTable.get(i) + " -> " + literalAddress.get(i));
+
+        System.out.println("\n--- PASS II OUTPUT ---");
+        for (String ic : intermediateCode) {
+            if (ic.contains("IS")) {
+                String op = ic.substring(4, 6);
+                String reg = ic.contains("(1)") ? "1" :
+                             ic.contains("(2)") ? "2" :
+                             ic.contains("(3)") ? "3" : "0";
+                String mem = "000";
+
+                if (ic.contains("(S,")) {
+                    String sym = ic.substring(ic.indexOf("(S,") + 3, ic.indexOf(")"));
+                    mem = String.valueOf(symbolTable.get(sym));
+                } else if (ic.contains("(L,")) {
+                    int idx = Integer.parseInt(ic.substring(ic.indexOf("(L,") + 3, ic.indexOf(")")));
+                    mem = String.valueOf(literalAddress.get(idx - 1));
+                } else if (ic.contains("(C,")) {
+                    mem = ic.substring(ic.indexOf("(C,") + 3, ic.indexOf(")"));
+                }
+
+                System.out.println(op + " " + reg + " " + mem);
+            }
+        }
+    }
+}
