@@ -1,0 +1,89 @@
+import java.util.*;
+
+public class DynamicLinkingLoader {
+
+    static class Symbol {
+        String name;
+        int address;
+        Symbol(String n, int a){ name=n; address=a; }
+    }
+
+    static Map<String,Integer> ESTAB = new LinkedHashMap<>();
+    static List<String[]> modules = new ArrayList<>();
+    static int startAddress = 0;
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of object modules: ");
+        int n = sc.nextInt(); sc.nextLine();
+
+        // Input object modules (simplified)
+        for(int i=0; i<n; i++){
+            System.out.println("
+Enter lines for Module "+(i+1)+" (END to stop):");
+            List<String> mod = new ArrayList<>();
+            while(true){
+                String line = sc.nextLine().trim();
+                if(line.equalsIgnoreCase("END")) break;
+                mod.add(line);
+            }
+            modules.add(mod.toArray(new String[0]));
+        }
+
+        pass1();
+        pass2();
+    }
+
+    // ---------- PASS 1 ----------
+    static void pass1(){
+        int currentAddress = startAddress;
+        System.out.println("
+=== PASS 1 : Building ESTAB ===");
+        for(String[] mod : modules){
+            for(String line : mod){
+                String[] parts = line.split("\s+");
+                if(parts[0].equalsIgnoreCase("DEF")){
+                    ESTAB.put(parts[1], currentAddress + Integer.parseInt(parts[2]));
+                    System.out.println("Added Symbol: "+parts[1]+" @ "+ESTAB.get(parts[1]));
+                }
+                else if(parts[0].equalsIgnoreCase("START")){
+                    currentAddress = Integer.parseInt(parts[1]);
+                }
+            }
+        }
+        System.out.println("ESTAB = "+ESTAB);
+    }
+
+    // ---------- PASS 2 ----------
+    static void pass2(){
+        System.out.println("
+=== PASS 2 : Linking and Relocation ===");
+        for(String[] mod : modules){
+            for(String line : mod){
+                String[] parts = line.split("\s+");
+                if(parts[0].equalsIgnoreCase("REF")){
+                    String sym = parts[1];
+                    if(ESTAB.containsKey(sym))
+                        System.out.println("Resolved reference to "+sym+" → Address "+ESTAB.get(sym));
+                    else
+                        System.out.println("Unresolved symbol: "+sym);
+                }
+                if(parts[0].equalsIgnoreCase("TEXT")){
+                    String inst = parts[1];
+                    String operand = parts[2];
+                    if(ESTAB.containsKey(operand))
+                        System.out.println("Loaded instruction: "+inst+" "+operand+
+                                           " → ("+ESTAB.get(operand)+")");
+                    else
+                        System.out.println("Loaded instruction: "+inst+" "+operand);
+                }
+            }
+        }
+        System.out.println("
+Linking completed successfully!");
+    }
+}
+
+
+
