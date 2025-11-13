@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>SPOS Practicals</title>
+<title>SPOS Practicals - Vedant Patil</title>
 <style>
   body { background:#0b0b0b; color:#eaeaea; font-family:'Segoe UI',sans-serif; padding:40px; line-height:1.6; }
   h1 { color:#00fff7; text-align:center; margin-bottom:30px; }
@@ -12,69 +12,187 @@
   a:hover { text-decoration:underline; color:#fff; }
   p { color:#bfbfbf; margin:6px 0 16px 0; }
   footer { margin-top:50px; text-align:center; font-size:0.85em; color:#777; }
-  .file-section { margin-bottom:20px; border-bottom:1px solid #222; padding-bottom:10px; }
+  .file-section { margin-bottom:25px; border-bottom:1px solid #222; padding-bottom:15px; }
+  .explanation {
+    background:#1b1b1b;
+    color:#ccc;
+    border-left:4px solid #00fff7;
+    padding:10px 20px;
+    border-radius:10px;
+    margin:10px 0 25px 0;
+    font-size:0.95em;
+  }
+  .explanation pre {
+    background:#111;
+    color:#00ffa2;
+    padding:8px;
+    border-radius:8px;
+    overflow-x:auto;
+  }
+  .explanation h3 {
+    color:#00ffa2;
+    margin-bottom:5px;
+  }
 </style>
 </head>
 <body>
-  <h1>SPOS Practicals - Quick Access </h1>
+  <h1>SPOS Practicals - Quick Access (Vedant Patil)</h1>
 
+  <!-- FCFS -->
   <div class="file-section">
     <h2><a href="FCFS.txt" target="_blank">1️⃣ FCFS Scheduling</a></h2>
     <p><b>Concept:</b> First Come First Serve – processes are executed in the order they arrive (non-preemptive).<br>
     <b>Key Formula:</b> TAT = CT − AT, WT = TAT − BT</p>
+    <div class="explanation">
+      <h3>🔍 Explanation:</h3>
+      <p>FCFS scheduling executes processes in order of arrival. It is simple and non-preemptive but can cause long waiting times (convoy effect).<br>
+      <b>Steps:</b> Sort by arrival time → Calculate Completion, Turnaround, Waiting time.<br>
+      <b>Drawback:</b> Poor average waiting time if a long process arrives first.</p>
+    </div>
   </div>
 
+  <!-- SJF -->
   <div class="file-section">
     <h2><a href="SJF.txt" target="_blank">2️⃣ SJF (Preemptive) Scheduling</a></h2>
     <p><b>Concept:</b> Shortest Job First – CPU selects the process with the smallest remaining burst time. Preemption occurs when a new process with smaller BT arrives.<br>
     <b>Drawback:</b> May cause starvation for long jobs.</p>
+    <div class="explanation">
+      <h3>🔍 Explanation:</h3>
+      <p>Preemptive SJF (Shortest Remaining Time First) gives the CPU to the process with the smallest remaining burst time.<br>
+      <b>Steps:</b> Continuously check arriving processes → Choose shortest remaining → Update every time unit.<br>
+      <b>Advantage:</b> Minimizes average waiting time.<br>
+      <b>Disadvantage:</b> Starvation for large processes.</p>
+    </div>
   </div>
 
+  <!-- Priority -->
   <div class="file-section">
     <h2><a href="PriorityScheduling.txt" target="_blank">3️⃣ Priority Scheduling</a></h2>
     <p><b>Concept:</b> CPU executes process with the highest priority (lowest numeric value). Non-preemptive version.<br>
     <b>Issue:</b> Starvation; can be reduced by aging.</p>
+    <div class="explanation">
+      <h3>🔍 Explanation:</h3>
+      <p>Each process has a priority number; CPU executes the highest priority first.<br>
+      <b>Steps:</b> Sort by priority → Execute → Compute TAT, WT.<br>
+      <b>Advantage:</b> Suits critical task systems.<br>
+      <b>Disadvantage:</b> Low priority processes may starve; solved by aging (gradually raising priority).</p>
+    </div>
   </div>
 
+  <!-- Round Robin -->
   <div class="file-section">
     <h2><a href="RoundRobin.txt" target="_blank">4️⃣ Round Robin (Preemptive)</a></h2>
-    <p><b>Concept:</b> Each process gets equal fixed CPU time called Time Quantum (TQ). Preemptive scheduling based on cyclic order.<br>
+    <p><b>Concept:</b> Each process gets equal fixed CPU time (Time Quantum). Preemptive scheduling based on cyclic order.<br>
     <b>Note:</b> If TQ → large ⇒ FCFS; if small ⇒ frequent context switches.</p>
+    <div class="explanation">
+      <h3>🔍 Explanation:</h3>
+      <p>Round Robin is time-sharing scheduling. Processes are placed in a queue and each gets CPU for one time slice.<br>
+      <b>Steps:</b> Enqueue all processes → Execute for TQ → Remaining burst requeued.<br>
+      <b>Advantage:</b> Fair for all users.<br>
+      <b>Disadvantage:</b> High context switching if quantum too small.</p>
+    </div>
   </div>
 
+  <!-- Memory Placement -->
   <div class="file-section">
     <h2><a href="MemoryScheduling.txt" target="_blank">5️⃣ Memory Placement Strategies</a></h2>
     <p><b>Concept:</b> Simulate memory allocation – First Fit, Best Fit, Worst Fit, Next Fit.<br>
     <b>Goal:</b> Efficiently assign processes to memory blocks while minimizing fragmentation.</p>
+    <div class="explanation">
+      <h3>🔍 Explanation:</h3>
+      <p>Memory placement strategies decide how to allocate memory blocks to processes.<br>
+      <b>First Fit:</b> First available block that fits.<br>
+      <b>Best Fit:</b> Smallest block that fits.<br>
+      <b>Worst Fit:</b> Largest block that fits.<br>
+      <b>Next Fit:</b> Like First Fit but starts from the last allocated block.<br>
+      <b>Fragmentation:</b> External (holes) and Internal (unused inside block).</p>
+    </div>
   </div>
 
+  <!-- Page Replacement -->
   <div class="file-section">
     <h2><a href="PageReplacement.txt" target="_blank">6️⃣ Page Replacement Algorithms</a></h2>
     <p><b>Concept:</b> Manage limited frames using FIFO, LRU, or Optimal page replacement.<br>
     <b>Key Term:</b> Page Fault – when a requested page is not in memory.<br>
-    <b>Note:</b> Optimal is ideal, LRU is practical, FIFO is simple but can show Belady’s anomaly.</p>
+    <b>Note:</b> Optimal is ideal, LRU is practical, FIFO can show Belady’s anomaly.</p>
+    <div class="explanation">
+      <h3>🔍 Explanation:</h3>
+      <p>Page replacement handles which memory page to replace on a page fault.<br>
+      <b>FIFO:</b> Replace oldest page.<br>
+      <b>LRU:</b> Replace least recently used.<br>
+      <b>Optimal:</b> Replace page not needed for longest future time.<br>
+      <b>Belady’s Anomaly:</b> In FIFO, more frames can mean more faults.<br>
+      <b>Data Structures:</b> Queue for FIFO, List for LRU, ArrayList for Optimal.</p>
+    </div>
   </div>
 
+  <!-- Producer-Consumer -->
   <div class="file-section">
     <h2><a href="ProducerConsumer.txt" target="_blank">7️⃣ Producer–Consumer Synchronization</a></h2>
     <p><b>Concept:</b> Classic synchronization problem using Semaphores/Mutex.<br>
     <b>Goal:</b> Ensure producer doesn’t overflow buffer and consumer doesn’t consume empty buffer.</p>
+    <div class="explanation">
+      <h3>🔍 Explanation:</h3>
+      <p>Producer-Consumer uses semaphores to synchronize buffer access.<br>
+      <b>wait()</b> decreases semaphore; <b>signal()</b> increases it.<br>
+      <b>Producer:</b> Adds item only if buffer not full.<br>
+      <b>Consumer:</b> Removes item only if buffer not empty.<br>
+      Prevents race conditions using mutual exclusion.</p>
+    </div>
   </div>
 
+  <!-- Two Pass Assembler -->
   <div class="file-section">
     <h2><a href="TwoPassAssembler.txt" target="_blank">8️⃣ Two Pass Assembler</a></h2>
-    <p><b>Concept:</b> Converts assembly language into machine code in two passes –<br>
+    <p><b>Concept:</b> Converts assembly language into machine code in two passes.<br>
     Pass I builds symbol/literal tables; Pass II generates final code using intermediate results.</p>
+    <div class="explanation">
+      <h3>🔍 Explanation:</h3>
+      <p>Two-pass assembler separates address resolution from code generation.<br>
+      <b>Pass 1:</b> Build symbol and literal tables, compute location counter.<br>
+      <b>Pass 2:</b> Substitute symbols with addresses and generate machine code.<br>
+      <b>Tables Used:</b> Symbol Table, Literal Table, Pool Table, Opcode Table.<br>
+      <b>Output:</b> Intermediate code + final machine code.</p>
+    </div>
   </div>
 
+  <!-- Macro Processor -->
   <div class="file-section">
     <h2><a href="MacroProcessor.txt" target="_blank">9️⃣ Macro Processor</a></h2>
     <p><b>Concept:</b> Expands macros before assembly; replaces macro calls with their definitions.<br>
     <b>Goal:</b> Code reuse, compact assembly programs.</p>
+    <div class="explanation">
+      <h3>🔍 Explanation:</h3>
+      <p><b>What is a Two-Pass Macro Processor?</b><br>
+      Handles macro definitions and expansions in two phases:<br><br>
+      <b>PASS 1:</b> Detect MACRO...MEND → Build MNT, MDT, ALA.<br>
+      Replace formal parameters with placeholders (#1, #2).<br><br>
+      <b>PASS 2:</b> Scan again → Find macro calls → Substitute arguments → Expand code.<br><br>
+      <b>Key Data Structures:</b><br>
+      MNT – Macro Name Table<br>
+      MDT – Macro Definition Table<br>
+      ALA – Argument List Array<br><br>
+      <b>Example Input:</b>
+      <pre>
+      MACRO
+      ADD_TWO A,B
+      LOAD A
+      ADD B
+      MEND
+      ADD_TWO X,Y
+      </pre>
+      <b>Output:</b>
+      <pre>
+      LOAD X
+      ADD Y
+      </pre>
+      This separates definition processing from expansion and supports multiple macros.
+      </p>
+    </div>
   </div>
 
   <footer>
-    SPOS Lab Practical Codes © 2025
+    SPOS Lab Practical Codes © 2025 — Created by Vedant Patil
   </footer>
 </body>
 </html>
